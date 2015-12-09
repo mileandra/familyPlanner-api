@@ -2,9 +2,6 @@ require 'spec_helper'
 
 describe Api::V1::SessionsController do
 
-  # Test creation
-  # Test delete
-
   describe 'POST #create' do
     before(:each) do
       @user = FactoryGirl.create :user
