@@ -5,6 +5,7 @@ describe Api::V1::UsersController do
   describe 'GET #show' do
     before(:each) do
       @user = FactoryGirl.create :user
+      api_authorization_header(@user.auth_token)
       get :show, id: @user.id
     end
 
@@ -53,6 +54,7 @@ describe Api::V1::UsersController do
       new_email = 'newmail@example.com'
       before(:each) do
         @user = FactoryGirl.create :user
+        api_authorization_header(@user.auth_token)
         put :update, { id: @user.id, user: { email: new_email } }, format: :json
       end
 
@@ -66,6 +68,7 @@ describe Api::V1::UsersController do
     context 'when update fails' do
       before(:each) do
         @user = FactoryGirl.create :user
+        api_authorization_header(@user.auth_token)
         put :update, { id: @user.id, user: { email: 'bademail.com' } }
       end
 
@@ -85,6 +88,7 @@ describe Api::V1::UsersController do
   describe 'DELETE #destroy' do
     before(:each) do
       @user = FactoryGirl.create :user
+      api_authorization_header @user.auth_token
       delete :destroy, { id: @user.id }
     end
 
