@@ -1,6 +1,6 @@
 class Api::V1::UsersController < ApplicationApiController
 
-  before_action :authenticate_with_token!, except: [:create]
+  before_action :authenticate_with_token!, :except => :create
 
   def show
     respond_with User.find(params[:id])
@@ -8,6 +8,7 @@ class Api::V1::UsersController < ApplicationApiController
 
   def create
     user = User.new(user_params)
+    user.generate_authentication_token!
     if user.save
       render json: user, status: 201
     else
@@ -30,9 +31,11 @@ class Api::V1::UsersController < ApplicationApiController
     head 204
   end
 
+
   private
   def user_params
     params.require(:user).permit(:email, :password, :password_confirmation)
   end
+
 
 end

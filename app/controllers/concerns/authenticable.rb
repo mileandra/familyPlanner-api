@@ -1,6 +1,7 @@
 module Authenticable
 
   def current_user
+    return nil unless request.headers['Authorization']
     @current_user ||= User.find_by(auth_token: request.headers['Authorization'])
   end
 

@@ -10,6 +10,7 @@ describe User do
   it { should respond_to(:password) }
   it { should respond_to(:password_confirmation) }
   it { should respond_to(:auth_token) }
+  it { should respond_to(:owned_group) }
 
   it { should validate_presence_of(:email) }
   it { should validate_uniqueness_of(:email) }
