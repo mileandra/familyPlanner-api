@@ -2,6 +2,7 @@ class Group < ActiveRecord::Base
   belongs_to :owner, :class_name => "User"
 
   validates_presence_of :owner_id
+  validates_presence_of :name
 
   after_create :set_owner_group
 
