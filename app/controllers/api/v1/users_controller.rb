@@ -3,7 +3,7 @@ class Api::V1::UsersController < ApplicationApiController
   before_action :authenticate_with_token!, :except => :create
 
   def show
-    respond_with User.find(params[:id])
+    respond_with User.includes(:group).find(params[:id])
   end
 
   def create
