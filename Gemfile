@@ -52,6 +52,7 @@ group :development, :test do
   gem 'spring'
 
   gem "rspec-rails", "~> 2.14"
+  gem 'rspec-activemodel-mocks'
   gem "factory_girl_rails"
   gem 'ffaker'
   gem "shoulda-matchers"

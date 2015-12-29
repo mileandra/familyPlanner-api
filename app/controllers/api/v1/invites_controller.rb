@@ -14,6 +14,9 @@ class Api::V1::InvitesController < ApplicationApiController
   end
 
   def accept
+    # Remove all expired codes
+    Invitation.where('created_at < ?', 24.hours.ago).delete_all
+
     code = params[:code]
     invite = Invitation.includes(:group).find_by(code: code)
     unless invite.nil?
