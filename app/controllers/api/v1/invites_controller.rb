@@ -19,7 +19,13 @@ class Api::V1::InvitesController < ApplicationApiController
 
     code = params[:code]
     invite = Invitation.includes(:group).find_by(code: code)
-    unless invite.nil?
+
+    if invite.nil?
+      return render json: { errors: "Invalid invitation code"}, status: 422
+    end
+    current_user.group = invite.group
+
+    if current_user.save
       render json: invite.group, status: 201
     else
       render json: { errors: "Invalid invitation code"}, status: 422
