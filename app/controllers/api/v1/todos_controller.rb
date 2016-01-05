@@ -13,6 +13,23 @@ class Api::V1::TodosController < ApplicationApiController
     end
   end
 
+  def update
+    todo = Todo.find(params[:id])
+    todo_completed = todo.completed?
+
+    todo.update_attributes(todo_params)
+
+    if todo.completed? && !todo_completed
+      todo.user = current_user
+    end
+
+    if todo.save
+      render json: todo, status: 200
+    else
+      render json: {errors: todo.errors.full_messages.join(", ") }, status: 422
+    end
+  end
+
   private
   def todo_params
     params.require(:todo).permit(:title, :group_id, :user_id, :completed, :creator_id)
