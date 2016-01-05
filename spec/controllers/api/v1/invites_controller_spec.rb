@@ -23,10 +23,7 @@ describe Api::V1::InvitesController do
   describe 'POST #accept' do
     context 'when it is successfully accepted' do
       before(:each) do
-        @user = FactoryGirl.create(:user)
-        @group = FactoryGirl.build(:group)
-        @group.owner = @user
-        @group.save
+        @user = create_user_with_group
 
 
         @invite = FactoryGirl.build(:invitation)
@@ -69,10 +66,7 @@ describe Api::V1::InvitesController do
     context 'it should remove all expired invites' do
       before(:each) do
 
-        @user = FactoryGirl.create(:user)
-        @group = FactoryGirl.build(:group)
-        @group.owner = @user
-        @group.save
+        @user = create_user_with_group
 
 
         @invite = FactoryGirl.build(:invitation)
