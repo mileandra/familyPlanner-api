@@ -24,4 +24,15 @@ module Request
       api_response_format
     end
   end
+
+  module ModelHelpers
+    def create_user_with_group
+      user = FactoryGirl.create(:user)
+      group = FactoryGirl.build(:group)
+      group.owner = user
+      group.save
+      user.reload
+      return user
+    end
+  end
 end

@@ -42,7 +42,7 @@ describe Api::V1::UsersController do
       end
 
       it 'renders the errors on why it could not be created' do
-        expect(json_response[:errors][:email]).to include "can't be blank"
+        expect(json_response[:errors]).to include "can't be blank"
       end
 
       it { should respond_with 422 }
@@ -77,7 +77,7 @@ describe Api::V1::UsersController do
       end
 
       it 'renders the errors on why it could not be updated' do
-        expect(json_response[:errors][:email]).to include 'is invalid'
+        expect(json_response[:errors]).to include 'is invalid'
       end
 
       it { should respond_with 422 }
