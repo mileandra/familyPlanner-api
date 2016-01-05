@@ -12,7 +12,7 @@ Rails.application.routes.draw do
           post :accept
         end
       end
-      resources :todos, :only => [:create, :update]
+      resources :todos, :only => [:create, :update, :destroy]
     end
   end
 

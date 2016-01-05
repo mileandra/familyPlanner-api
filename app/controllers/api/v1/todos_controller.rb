@@ -30,6 +30,12 @@ class Api::V1::TodosController < ApplicationApiController
     end
   end
 
+  def destroy
+    todo = Todo.find(params[:id])
+    todo.destroy
+    head 204
+  end
+
   private
   def todo_params
     params.require(:todo).permit(:title, :group_id, :user_id, :completed, :creator_id)

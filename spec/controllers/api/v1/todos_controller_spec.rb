@@ -76,5 +76,39 @@ describe Api::V1::TodosController do
 
       it { should respond_with 200 }
     end
+
+    context 'when it is not successfully updated' do
+      before(:each) do
+        @user = create_user_with_group
+        @todo = FactoryGirl.build(:todo)
+        @todo.creator = @user
+        @todo.group = @user.group
+        @todo.save
+
+        api_authorization_header(@user.auth_token)
+        put :update, {id: @todo.id, todo: {title: ''}}
+      end
+
+      it 'should return a string with errors' do
+        expect(json_response[:errors]).to include 'blank'
+      end
+
+      it { should respond_with 422 }
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    before(:each) do
+      @user = create_user_with_group
+      @todo = FactoryGirl.build(:todo)
+      @todo.creator = @user
+      @todo.group = @user.group
+      @todo.save
+
+      api_authorization_header @user.auth_token
+      delete :destroy, { id: @todo.id }
+    end
+
+    it { should respond_with 204 }
   end
 end
