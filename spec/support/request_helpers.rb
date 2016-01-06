@@ -34,5 +34,13 @@ module Request
       user.reload
       return user
     end
+
+    def create_todo(user)
+      todo = FactoryGirl.build(:todo)
+      todo.creator = user
+      todo.group = user.group
+      todo.save
+      todo
+    end
   end
 end

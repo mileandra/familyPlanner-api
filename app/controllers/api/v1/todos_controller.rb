@@ -2,6 +2,13 @@ class Api::V1::TodosController < ApplicationApiController
 
   before_filter :authenticate_with_token!
 
+  def index
+
+    @todos = Todo.where('completed = ? AND group_id = ?', false, current_user.group_id).order(updated_at: :desc)
+
+    render json: @todos, status: 200
+  end
+
   def create
     @todo = Todo.new(todo_params)
     @todo.creator = current_user

@@ -57,10 +57,7 @@ describe Api::V1::TodosController do
     context 'when it is successfully udpated' do
       before(:each) do
         @user = create_user_with_group
-        @todo = FactoryGirl.build(:todo)
-        @todo.creator = @user
-        @todo.group = @user.group
-        @todo.save
+        @todo = create_todo(@user)
 
         api_authorization_header(@user.auth_token)
         put :update, {id: @todo.id, todo: {completed: true}}
@@ -80,10 +77,7 @@ describe Api::V1::TodosController do
     context 'when it is not successfully updated' do
       before(:each) do
         @user = create_user_with_group
-        @todo = FactoryGirl.build(:todo)
-        @todo.creator = @user
-        @todo.group = @user.group
-        @todo.save
+        @todo = create_todo(@user)
 
         api_authorization_header(@user.auth_token)
         put :update, {id: @todo.id, todo: {title: ''}}
@@ -100,15 +94,40 @@ describe Api::V1::TodosController do
   describe 'DELETE #destroy' do
     before(:each) do
       @user = create_user_with_group
-      @todo = FactoryGirl.build(:todo)
-      @todo.creator = @user
-      @todo.group = @user.group
-      @todo.save
+      @todo = create_todo(@user)
 
       api_authorization_header @user.auth_token
       delete :destroy, { id: @todo.id }
     end
 
     it { should respond_with 204 }
+  end
+
+  describe 'GET #index' do
+    before(:each) do
+      @user = create_user_with_group
+      @todo1 = create_todo(@user)
+      @todo2 = create_todo(@user)
+      @todo3 = create_todo(@user)
+      @completed_todo = create_todo(@user)
+      @completed_todo.completed = true
+      @completed_todo.save
+
+      user2 = create_user_with_group
+      other_user_todo = create_todo(user2)
+
+      api_authorization_header @user.auth_token
+      get :index
+    end
+
+    it 'should list all uncompleted todos of @users group' do
+      expect(json_response.count).to eql 3
+    end
+
+    it 'should sort todos by update date desc' do
+      expect(json_response[0][:id]).to eql @todo3.id
+    end
+
+    it { should respond_with 200}
   end
 end
