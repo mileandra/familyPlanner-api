@@ -121,11 +121,11 @@ describe Api::V1::TodosController do
     end
 
     it 'should list all todos of @users group' do
-      expect(json_response.count).to eql 3
+      expect(json_response.count).to eql 4
     end
 
     it 'should sort todos by update date desc' do
-      expect(json_response[0][:id]).to eql @todo3.id
+      expect(json_response[0][:id]).to eql @completed_todo.id
     end
 
     it { should respond_with 200}

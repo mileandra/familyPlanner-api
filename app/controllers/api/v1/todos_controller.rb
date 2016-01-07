@@ -4,7 +4,7 @@ class Api::V1::TodosController < ApplicationApiController
 
   def index
 
-    @todos = Todo.where('group_id = ?', false, current_user.group_id).order(updated_at: :desc)
+    @todos = Todo.where('group_id = ?', current_user.group_id).order(updated_at: :desc)
 
     render json: @todos, status: 200
   end
