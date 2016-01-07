@@ -120,7 +120,7 @@ describe Api::V1::TodosController do
       get :index
     end
 
-    it 'should list all uncompleted todos of @users group' do
+    it 'should list all todos of @users group' do
       expect(json_response.count).to eql 3
     end
 
