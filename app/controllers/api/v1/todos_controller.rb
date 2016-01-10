@@ -3,10 +3,15 @@ class Api::V1::TodosController < ApplicationApiController
   before_filter :authenticate_with_token!
 
   def index
+    if params[:since]
+      since = params[:since].to_s
+      @todos = Todo.where('group_id = ? AND updated_at >= ?', current_user.group_id, since).order(updated_at: :desc)
+    else
+      @todos = Todo.where('group_id = ?', current_user.group_id).order(updated_at: :desc)
+    end
 
-    @todos = Todo.where('group_id = ?', current_user.group_id).order(updated_at: :desc)
 
-    render json: @todos, status: 200
+    render json: {todos: @todos, synctime: Time.now }, status: 200
   end
 
   def create

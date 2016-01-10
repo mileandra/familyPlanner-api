@@ -121,13 +121,32 @@ describe Api::V1::TodosController do
     end
 
     it 'should list all todos of @users group' do
-      expect(json_response.count).to eql 4
+      expect(json_response[:todos].count).to eql 4
     end
 
     it 'should sort todos by update date desc' do
-      expect(json_response[0][:id]).to eql @completed_todo.id
+      expect(json_response[:todos][0][:id]).to eql @completed_todo.id
     end
 
     it { should respond_with 200}
+  end
+
+  describe 'GET #index with params since' do
+    before(:each) do
+      @user = create_user_with_group
+      @todo1 = create_todo(@user)
+      @todo1.updated_at = 2.days.ago
+      @todo1.save
+      @todo2 = create_todo(@user)
+      @todo3 = create_todo(@user)
+
+      api_authorization_header @user.auth_token
+      @todo2.reload()
+      get :index, { since: 3.minute.ago }
+    end
+
+    it 'shows only todos updated after timestamp' do
+      expect(json_response[:todos].count).to eql 2
+    end
   end
 end
