@@ -13,6 +13,7 @@ Rails.application.routes.draw do
         end
       end
       resources :todos, :only => [:index, :create, :update, :destroy]
+      resources :messages, :only => [:index, :create, :update, :destroy]
     end
   end
 
