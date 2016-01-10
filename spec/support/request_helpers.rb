@@ -42,5 +42,13 @@ module Request
       todo.save
       todo
     end
+
+    def create_message(user)
+      message = FactoryGirl.build(:message)
+      message.user = user
+      message.group = user.group
+      message.save
+      message
+    end
   end
 end
