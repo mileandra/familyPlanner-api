@@ -25,6 +25,24 @@ describe Api::V1::MessagesController do
 
     end
 
+    context 'when it has a parent message' do
+      before(:each) do
+        @user = create_user_with_group
+        @message = create_message(@user)
+        @message_attributes = FactoryGirl.attributes_for(:message)
+        @message_attributes[:responds_id] = @message.id
+
+        api_authorization_header(@user.auth_token)
+        post :create, { message: @message_attributes }
+      end
+
+      it 'returns a json fo the created message' do
+        expect(json_response[:responds_id]).to eql @message.id
+      end
+
+      it { should respond_with 201 }
+    end
+
     context 'when it is not successfully created' do
       before(:each) do
         @user = create_user_with_group
@@ -108,6 +126,11 @@ describe Api::V1::MessagesController do
       @message1 = create_message(@user)
       @message2 = create_message(@user)
       @message3 = create_message(@user)
+      @message_3_response = FactoryGirl.build(:message)
+      @message_3_response.responds = @message3
+      @message_3_response.user = @user
+      @message_3_response.save
+
 
       user2 = create_user_with_group
       other_user_message = create_message(user2)
@@ -120,8 +143,13 @@ describe Api::V1::MessagesController do
       expect(json_response[:messages].count).to eql 3
     end
 
-    it 'should sort todos by update date desc' do
+    it 'should sort message by update date desc' do
       expect(json_response[:messages][0][:id]).to eql @message3.id
+    end
+
+    it 'should show the response for message 3' do
+      puts(json_response)
+      expect(json_response[:messages][0][:responses][0][:id]).to eql @message_3_response.id
     end
 
     it { should respond_with 200}
