@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160114215203) do
+ActiveRecord::Schema.define(version: 20160116221857) do
 
   create_table "groups", force: :cascade do |t|
     t.string   "name"
@@ -37,10 +37,11 @@ ActiveRecord::Schema.define(version: 20160114215203) do
     t.text     "message"
     t.integer  "user_id"
     t.integer  "group_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
     t.string   "subject"
     t.integer  "responds_id"
+    t.boolean  "read",        default: false
   end
 
   add_index "messages", ["group_id"], name: "index_messages_on_group_id"

@@ -5,6 +5,7 @@ FactoryGirl.define do
     user nil
     group nil
     responds nil
+    read false
   end
 
 end
