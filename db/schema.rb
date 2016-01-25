@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160125192459) do
+ActiveRecord::Schema.define(version: 20160125202655) do
 
   create_table "groups", force: :cascade do |t|
     t.string   "name"
@@ -46,6 +46,17 @@ ActiveRecord::Schema.define(version: 20160125192459) do
 
   add_index "messages", ["group_id"], name: "index_messages_on_group_id"
   add_index "messages", ["user_id"], name: "index_messages_on_user_id"
+
+  create_table "todo_user_archives", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "todo_id"
+    t.boolean  "archived"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "todo_user_archives", ["todo_id"], name: "index_todo_user_archives_on_todo_id"
+  add_index "todo_user_archives", ["user_id"], name: "index_todo_user_archives_on_user_id"
 
   create_table "todos", force: :cascade do |t|
     t.string   "title"
