@@ -27,14 +27,16 @@ class Api::V1::TodosController < ApplicationApiController
 
   def archive
     @todos = Todo.where('group_id = ? AND completed = ? AND id NOT IN(select todo_id from todo_user_archives where archived = ?)', current_user.group_id, true, true)
+    ids = []
     @todos.each do |todo|
       tua = TodoUserArchive.new()
       tua.user = current_user
       tua.todo = todo
       tua.archived = true
       tua.save
+      ids << todo.id
     end
-    return render json: {success: true}, status: 422
+    return render json: {success: true, ids: ids}, status: 422
   end
 
   def update
