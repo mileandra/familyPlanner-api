@@ -29,15 +29,29 @@ describe Api::V1::MessagesController do
       before(:each) do
         @user = create_user_with_group
         @message = create_message(@user)
+        @message.read = true
+        @message.save!
         @message_attributes = FactoryGirl.attributes_for(:message)
         @message_attributes[:responds_id] = @message.id
 
         api_authorization_header(@user.auth_token)
+
         post :create, { message: @message_attributes }
+
       end
 
       it 'returns a json fo the created message' do
         expect(json_response[:responds_id]).to eql @message.id
+      end
+
+      it 'has the updated_date of the new child message' do
+        @message.reload
+        expect(json_response[:updated_at]).to eql @message.updated_at.as_json
+      end
+
+      it 'is unread after a new unread response' do
+        @message.reload
+        expect(@message.read).to be_falsey
       end
 
       it { should respond_with 201 }

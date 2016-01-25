@@ -13,6 +13,7 @@ class User < ActiveRecord::Base
   before_create :generate_authentication_token!
 
   validates :auth_token, uniqueness: true
+  validates_presence_of :name
 
   def generate_authentication_token!
     begin
