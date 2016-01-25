@@ -26,7 +26,12 @@ class Api::V1::TodosController < ApplicationApiController
   end
 
   def archive
-    @todos = Todo.where('group_id = ? AND completed = ? AND id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', current_user.group_id, true, true, current_user.id)
+    if params[:ids]
+      @todos = TODO.where('id IN (?) AND id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', params[:ids].join(','), true, current_user.id)
+    else
+      @todos = Todo.where('group_id = ? AND completed = ? AND id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', current_user.group_id, true, true, current_user.id)
+    end
+
     ids = []
     @todos.each do |todo|
       tua = TodoUserArchive.new()
