@@ -5,9 +5,9 @@ class Api::V1::TodosController < ApplicationApiController
   def index
     if params[:since]
       since = params[:since].to_s
-      @todos = Todo.where('group_id = ? AND updated_at >= ?', current_user.group_id, since).order(updated_at: :desc)
+      @todos = Todo.where('group_id = ? AND updated_at >= ? AND id NOT IN(select todo_id from todo_user_archives where archived = ?)', current_user.group_id, since, true).order(updated_at: :desc)
     else
-      @todos = Todo.where('group_id = ?', current_user.group_id).order(updated_at: :desc)
+      @todos = Todo.where('group_id = ? AND id NOT IN(select todo_id from todo_user_archives where archived = ?)', current_user.group_id, true).order(updated_at: :desc)
     end
 
 
@@ -23,6 +23,18 @@ class Api::V1::TodosController < ApplicationApiController
     else
       return render json: { errors: @todo.errors.full_messages.join(", ") }, status: 422
     end
+  end
+
+  def archive
+    @todos = Todo.where('group_id = ? AND completed = ? AND id NOT IN(select todo_id from todo_user_archives where archived = ?)', current_user.group_id, true, true)
+    @todos.each do |todo|
+      tua = TodoUserArchive.new()
+      tua.user = current_user
+      tua.todo = todo
+      tua.archived = true
+      tua.save
+    end
+    return render json: {success: true}, status: 422
   end
 
   def update

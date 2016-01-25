@@ -74,6 +74,7 @@ describe Api::V1::TodosController do
       it { should respond_with 200 }
     end
 
+
     context 'when it is not successfully updated' do
       before(:each) do
         @user = create_user_with_group
@@ -89,6 +90,27 @@ describe Api::V1::TodosController do
 
       it { should respond_with 422 }
     end
+  end
+
+  describe 'POST #archive' do
+    before(:each) do
+      @user = create_user_with_group
+      @todo1 = create_todo(@user)
+      @todo1.completed = true
+      @todo1.save
+      @todo2 = create_todo(@user)
+      @todo3 = create_todo(@user)
+
+      api_authorization_header(@user.auth_token)
+      post :archive
+      get :index
+    end
+
+    it 'should no longer return archived todos (completed)' do
+      expect(json_response[:todos].count).to eql 2
+    end
+
+    it { should respond_with 200 }
   end
 
   describe 'DELETE #destroy' do
