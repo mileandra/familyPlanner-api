@@ -19,29 +19,21 @@ class Api::V1::TodosController < ApplicationApiController
     @todo.creator = current_user
     @todo.group_id = current_user.group_id
     if @todo.save
-      return render json: @todo, status: 201
+      render json: @todo, status: 201
     else
-      return render json: { errors: @todo.errors.full_messages.join(", ") }, status: 422
+      render json: { errors: @todo.errors.full_messages.join(", ") }, status: 422
     end
   end
 
   def archive
-    if params[:ids]
-      @todos = TODO.where('id IN (?) AND id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', params[:ids].join(','), true, current_user.id)
-    else
-      @todos = Todo.where('group_id = ? AND completed = ? AND id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', current_user.group_id, true, true, current_user.id)
+    todo = Todo.find(params[:id])
+    tua = TodoUserArchive.new()
+    tua.todo = todo
+    tua.user = current_user
+    tua.archived = true
+    if tua.save
+      render json: {success: true}, status: 422
     end
-
-    ids = []
-    @todos.each do |todo|
-      tua = TodoUserArchive.new()
-      tua.user = current_user
-      tua.todo = todo
-      tua.archived = true
-      tua.save
-      ids << todo.id
-    end
-    return render json: {success: true, ids: ids}, status: 422
   end
 
   def update
@@ -55,7 +47,12 @@ class Api::V1::TodosController < ApplicationApiController
     end
 
     if todo.save
-      render json: todo, status: 200
+      if params[:todo][:archived]
+        puts "archived"
+        todo.archive(current_user)
+        todo.archived = true
+      end
+      render json: todo, :methods => [:archived], status: 200
     else
       render json: {errors: todo.errors.full_messages.join(", ") }, status: 422
     end
@@ -69,6 +66,6 @@ class Api::V1::TodosController < ApplicationApiController
 
   private
   def todo_params
-    params.require(:todo).permit(:title, :group_id, :user_id, :completed, :creator_id)
+    params.require(:todo).permit(:title, :group_id, :user_id, :completed, :creator_id, :archived)
   end
 end
