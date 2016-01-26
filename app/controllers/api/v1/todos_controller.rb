@@ -5,9 +5,9 @@ class Api::V1::TodosController < ApplicationApiController
   def index
     if params[:since]
       since = params[:since].to_s
-      @todos = Todo.where('group_id = ? AND updated_at >= ? AND id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', current_user.group_id, since, true, current_user.id).order(updated_at: :desc)
+      @todos = current_user.todos.where('todos.updated_at >= ? AND todos.id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', since, true, current_user.id).order(updated_at: :desc)
     else
-      @todos = Todo.where('group_id = ? AND id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', current_user.group_id, true, current_user.id).order(updated_at: :desc)
+      @todos = current_user.todos.where('todos.id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', true, current_user.id).order(updated_at: :desc)
     end
 
 
@@ -19,24 +19,21 @@ class Api::V1::TodosController < ApplicationApiController
     @todo.creator = current_user
     @todo.group_id = current_user.group_id
     if @todo.save
-      return render json: @todo, status: 201
+      render json: @todo, status: 201
     else
-      return render json: { errors: @todo.errors.full_messages.join(", ") }, status: 422
+      render json: { errors: @todo.errors.full_messages.join(", ") }, status: 422
     end
   end
 
   def archive
-    @todos = Todo.where('group_id = ? AND completed = ? AND id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', current_user.group_id, true, true, current_user.id)
-    ids = []
-    @todos.each do |todo|
-      tua = TodoUserArchive.new()
-      tua.user = current_user
-      tua.todo = todo
-      tua.archived = true
-      tua.save
-      ids << todo.id
+    todo = Todo.find(params[:id])
+    tua = TodoUserArchive.new()
+    tua.todo = todo
+    tua.user = current_user
+    tua.archived = true
+    if tua.save
+      render json: {success: true}, status: 422
     end
-    return render json: {success: true, ids: ids}, status: 422
   end
 
   def update
@@ -50,7 +47,17 @@ class Api::V1::TodosController < ApplicationApiController
     end
 
     if todo.save
-      render json: todo, status: 200
+      if params[:todo][:archived] && params[:todo][:archived] == true
+        tua = TodoUserArchive.new
+        tua.user = current_user
+        tua.todo = todo
+        tua.archived = true
+        if tua.save
+          puts "archived tua"
+          todo.archived = true
+        end
+      end
+      render json: todo, :methods => [:archived], status: 200
     else
       render json: {errors: todo.errors.full_messages.join(", ") }, status: 422
     end
@@ -64,6 +71,6 @@ class Api::V1::TodosController < ApplicationApiController
 
   private
   def todo_params
-    params.require(:todo).permit(:title, :group_id, :user_id, :completed, :creator_id)
+    params.require(:todo).permit(:title, :group_id, :user_id, :completed, :creator_id, :archived)
   end
 end

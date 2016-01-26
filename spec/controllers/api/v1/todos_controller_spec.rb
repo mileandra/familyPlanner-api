@@ -74,6 +74,26 @@ describe Api::V1::TodosController do
       it { should respond_with 200 }
     end
 
+    context 'when it is archived' do
+      before(:each) do
+        @user = create_user_with_group
+        @todo = create_todo(@user)
+
+        api_authorization_header(@user.auth_token)
+        put :update, {id: @todo.id, todo: {completed: true, archived: true}}
+      end
+
+      it 'returns a json with updated data' do
+        expect(json_response[:archived]).to eql true
+      end
+
+      it 'has an updated archive entry' do
+        tua = TodoUserArchive.where('user_id = ? AND todo_id = ?', @user.id, @todo.id)
+
+        expect(tua[0].archived).to be_truthy
+      end
+    end
+
 
     context 'when it is not successfully updated' do
       before(:each) do
@@ -90,7 +110,9 @@ describe Api::V1::TodosController do
 
       it { should respond_with 422 }
     end
+
   end
+
 
   describe 'POST #archive' do
     before(:each) do
@@ -98,19 +120,16 @@ describe Api::V1::TodosController do
       @todo1 = create_todo(@user)
       @todo1.completed = true
       @todo1.save
-      @todo2 = create_todo(@user)
-      @todo3 = create_todo(@user)
 
       api_authorization_header(@user.auth_token)
-      post :archive
-      get :index
+      post :archive, { id: @todo1.id }
     end
 
-    it 'should no longer return archived todos (completed)' do
-      expect(json_response[:todos].count).to eql 2
+    it 'should return success' do
+      expect(json_response[:success]).to be_truthy
     end
 
-    it { should respond_with 200 }
+    it { should respond_with 422 }
   end
 
   describe 'DELETE #destroy' do
