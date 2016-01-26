@@ -74,4 +74,37 @@ describe Api::V1::GroupsController do
       it { should respond_with 422 }
     end
   end
+
+  describe 'GET #show' do
+    context 'when the current user has a group' do
+      before(:each) do
+        @user = create_user_with_group
+        @group = @user.group
+
+        api_authorization_header(@user.auth_token)
+        get :show, {id: @group.id}
+      end
+
+      it 'return the information about the group' do
+        expect(json_response[:users].count).to eql 1
+      end
+
+      it { should respond_with 200 }
+    end
+
+    context 'when the current user does not have a group' do
+      before(:each) do
+        @user = FactoryGirl.create(:user)
+
+        api_authorization_header(@user.auth_token)
+        get :show, {id: 1}
+      end
+
+      it 'will return a json with the error message' do
+        expect(json_response[:errors]).to include 'does not belong'
+      end
+
+      it should { respond_with 422 }
+    end
+  end
 end

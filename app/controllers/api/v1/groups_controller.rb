@@ -17,6 +17,14 @@ class Api::V1::GroupsController < ApplicationApiController
     end
   end
 
+  def show
+    if current_user.group.nil?
+      return render json: { errors: "This user does not belong to a group yet" }, status: 422
+    end
+    group = current_user.group
+    render json: group, :include => :users, status: 200
+  end
+
   private
   def group_params
     params.require(:group).permit(:name)
