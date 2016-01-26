@@ -5,9 +5,9 @@ class Api::V1::TodosController < ApplicationApiController
   def index
     if params[:since]
       since = params[:since].to_s
-      @todos = Todo.where('group_id = ? AND updated_at >= ? AND id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', current_user.group_id, since, true, current_user.id).order(updated_at: :desc)
+      @todos = current_user.todos.where('todos.updated_at >= ? AND todos.id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', since, true, current_user.id).order(updated_at: :desc)
     else
-      @todos = Todo.where('group_id = ? AND id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', current_user.group_id, true, current_user.id).order(updated_at: :desc)
+      @todos = current_user.todos.where('todos.id NOT IN(select todo_id from todo_user_archives where archived = ? AND user_id = ?)', true, current_user.id).order(updated_at: :desc)
     end
 
 
@@ -47,10 +47,15 @@ class Api::V1::TodosController < ApplicationApiController
     end
 
     if todo.save
-      if params[:todo][:archived]
-        puts "archived"
-        todo.archive(current_user)
-        todo.archived = true
+      if params[:todo][:archived] && params[:todo][:archived] == true
+        tua = TodoUserArchive.new
+        tua.user = current_user
+        tua.todo = todo
+        tua.archived = true
+        if tua.save
+          puts "archived tua"
+          todo.archived = true
+        end
       end
       render json: todo, :methods => [:archived], status: 200
     else

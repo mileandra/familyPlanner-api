@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
 
   has_one :owned_group, :class_name => "Group"
   has_many :invitations
-
+  has_many :todos, :through => :group
   belongs_to :group
   accepts_nested_attributes_for :owned_group
 

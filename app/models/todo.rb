@@ -8,9 +8,9 @@ class Todo < ActiveRecord::Base
   attr_accessor :archived
 
   def archive(user)
-    tua = TodoUserArchive.new
-    tua.todo_id = self.id
-    tua.user_id = user.id
+    tua = TodoUserArchive.new()
+    tua.todo = self
+    tua.user = user
     tua.archived = true
     tua.save
   end

@@ -86,6 +86,12 @@ describe Api::V1::TodosController do
       it 'returns a json with updated data' do
         expect(json_response[:archived]).to eql true
       end
+
+      it 'has an updated archive entry' do
+        tua = TodoUserArchive.where('user_id = ? AND todo_id = ?', @user.id, @todo.id)
+
+        expect(tua[0].archived).to be_truthy
+      end
     end
 
 
