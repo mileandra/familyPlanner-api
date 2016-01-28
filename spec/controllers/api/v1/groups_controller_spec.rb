@@ -107,4 +107,26 @@ describe Api::V1::GroupsController do
       it should { respond_with 422 }
     end
   end
+
+  describe 'POST #remove_member' do
+    context 'when the user is successfully removed' do
+      before(:each) do
+        @user = create_user_with_group
+        @group = @user.group
+
+        @user2 = FactoryGirl.create(:user)
+        @user2.group = @group
+        @user2.save
+
+        api_authorization_header(@user.auth_token)
+        post :remove_member, {user_id: @user2.id }
+      end
+
+      it 'will return a success message' do
+        expect(json_response[:success]).to be_truthy
+      end
+
+      it { should respond_with 204 }
+    end
+  end
 end
