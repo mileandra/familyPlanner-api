@@ -11,6 +11,6 @@ class CreateTodos < ActiveRecord::Migration
     end
     add_foreign_key :todos, :users
     add_foreign_key :todos, :groups
-    add_foreign_key :todos, :creators
+    add_foreign_key :todos, :users
   end
 end
