@@ -42,6 +42,6 @@ class Api::V1::MessagesController < ApplicationApiController
 
   private
   def message_params
-    params.require(:message).permit(:message, :group_id, :user_id, :subject, :responds_id)
+    params.require(:message).permit(:message, :group_id, :user_id, :subject, :responds_id, :read)
   end
 end
