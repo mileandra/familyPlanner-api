@@ -12,6 +12,7 @@ describe Message do
   it { should respond_to :responds }
   it { should respond_to :responses }
   it { should respond_to :read }
+  it { should respond_to :author }
 
   it { should validate_presence_of :message }
   it { should validate_presence_of :subject }

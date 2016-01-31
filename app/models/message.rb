@@ -8,6 +8,7 @@ class Message < ActiveRecord::Base
   validates_presence_of :subject, :if => :has_no_parent_message?
 
   after_create :update_parent
+  before_save :set_author
 
   accepts_nested_attributes_for :responds
 
@@ -23,5 +24,10 @@ class Message < ActiveRecord::Base
     parent.updated_at = self.updated_at
     parent.read = false
     parent.save()
+  end
+
+  def set_author
+    self.author = self.user.name
+    true
   end
 end
