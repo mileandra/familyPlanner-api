@@ -12,14 +12,16 @@ class Message < ActiveRecord::Base
   accepts_nested_attributes_for :responds
 
   def has_no_parent_message?
-    self.responds.nil?
+    self.responds_id.nil?
   end
 
   def update_parent
-    unless has_no_parent_message?
-      self.responds.updated_at = self.updated_at
-      self.responds.read = self.read
-      self.responds.save
+    if self.has_no_parent_message?
+      return
     end
+    parent = self.responds
+    parent.updated_at = self.updated_at
+    parent.read = false
+    parent.save()
   end
 end

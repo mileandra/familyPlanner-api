@@ -162,7 +162,6 @@ describe Api::V1::MessagesController do
     end
 
     it 'should show the response for message 3' do
-      puts(json_response)
       expect(json_response[:messages][0][:responses][0][:id]).to eql @message_3_response.id
     end
 
