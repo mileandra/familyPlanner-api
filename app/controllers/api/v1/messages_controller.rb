@@ -4,7 +4,7 @@ class Api::V1::MessagesController < ApplicationApiController
 
   def index
     if params[:since]
-      since = params[:since].to_s
+      since = params[:since].to_time
       @messages = Message.includes(:responses).where('responds_id IS NULL AND group_id = ? AND updated_at >= ?', current_user.group_id, since).order(updated_at: :desc)
     else
       @messages = Message.includes(:responses).where('responds_id IS NULL AND group_id = ?', current_user.group_id).order(updated_at: :desc)
