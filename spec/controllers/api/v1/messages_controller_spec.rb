@@ -21,6 +21,10 @@ describe Api::V1::MessagesController do
         expect(json_response[:user_id]).to eql @user.id
       end
 
+      it 'should include the author in the returned message' do
+        expect(json_response[:author]).to eql @user.name
+      end
+
       it { should respond_with 201 }
 
     end
